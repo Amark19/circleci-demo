@@ -1,0 +1,57 @@
+version: 2.1
+
+executors:
+  default:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/project
+
+jobs:
+  build:
+    executor: default
+    steps:
+      - checkout
+      - run:
+          name: Install dependencies
+          command: |
+            python -m venv venv
+            source venv/bin/activate
+            pip install -r requirements.txt
+      - persist_to_workspace:
+          root: .
+          paths:
+            - venv
+
+  test:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Run tests
+          command: |
+            source venv/bin/activate
+            pytest
+
+  deploy:
+    executor: default
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Deploy application
+          command: echo "Deploying Python application..."
+
+workflows:
+  version: 2
+  ci_pipeline:
+    jobs:
+      - build
+      - test:
+          requires:
+            - build
+      - deploy:
+          requires:
+            - test
