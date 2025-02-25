@@ -6,6 +6,9 @@ executors:
       - image: circleci/python:3.8
     working_directory: ~/project
 
+orbs:
+  amark-tests1-orb: amark/amark-tests1-orb@volatile
+
 jobs:
   build:
     executor: default
@@ -26,13 +29,24 @@ jobs:
     executor: default
     steps:
       - checkout
+      - amark-tests1-orb/fetch_rerun_vars:
+          delete_env_var: true
       - attach_workspace:
           at: .
       - run:
           name: Run tests
           command: |
+            echo "Bs Tests: $BS_ENV_VARS"
             source venv/bin/activate
-            pytest
+            export PYTHONPATH=src
+
+            if [[ -n "$BS_ENV_VARS" ]]; then
+              echo "Running only rerun tests: $BS_ENV_VARS"
+              pytest
+            else
+              echo "No rerun tests found, running full test suite."
+              pytest
+            fi
 
   deploy:
     executor: default
@@ -40,9 +54,12 @@ jobs:
       - checkout
       - attach_workspace:
           at: .
+      - amark-tests1-orb/fetch_rerun_vars
       - run:
           name: Deploy application
-          command: echo "Deploying Python application..."
+          command: |
+            echo "Bs Tests: $BS_ENV_VARS"
+            echo "Deploying Python application..."
 
 workflows:
   version: 2
@@ -55,3 +72,5 @@ workflows:
       - deploy:
           requires:
             - test
+      - amark-tests1-orb/cleanup_env:
+          requires: [test , deploy]
