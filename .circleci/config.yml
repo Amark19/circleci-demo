@@ -34,16 +34,16 @@ jobs:
       - attach_workspace:
           at: .
       - run:
-        name: Run tests
-        command: |
-          source venv/bin/activate
-          pip install pytest-html
-          export PYTHONPATH=$PWD
-          mkdir -p test-results artifacts
-          pytest \
-            --junitxml=test-results/junit.xml \
-            --html=artifacts/report.html \
-            --self-contained-html
+          name: Run tests
+          command: |
+            source venv/bin/activate
+            pip install pytest-html
+            export PYTHONPATH=$PWD
+            mkdir -p test-results artifacts
+            pytest \
+              --junitxml=test-results/junit.xml \
+              --html=artifacts/report.html \
+              --self-contained-html
       - store_test_results:
           path: test-results
       - store_artifacts:
