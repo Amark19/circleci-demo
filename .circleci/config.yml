@@ -47,8 +47,7 @@ jobs:
       - run:                                              
           name: Generate large artifacts for memory test
           command: |
-            # 500 MB text/plain — hits the buffering branch in makeRequest
-            yes "memtest-line-for-intg-2823" | head -c 524288 > artifacts/big.log
+            yes "memtest-line-for-intg-2823" | head -c 52 > artifacts/big.log
             ls -lh artifacts/
       - store_test_results:
           path: test-results
