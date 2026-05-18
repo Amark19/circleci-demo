@@ -47,7 +47,7 @@ jobs:
       - run:                                              
           name: Generate large artifacts for memory test
           command: |
-            yes "memtest-line-for-intg-2823" | head -c 5200 > artifacts/big.log
+            yes "memtest-line-for-intg-2823" | head -c 5242 > artifacts/big.log
             ls -lh artifacts/
       - store_test_results:
           path: test-results
