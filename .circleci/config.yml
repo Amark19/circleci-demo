@@ -44,6 +44,18 @@ jobs:
               --junitxml=test-results/junit.xml \
               --html=artifacts/report.html \
               --self-contained-html
+      - run:                                              
+          name: Generate large artifacts for memory test
+          command: |
+            # 500 MB text/plain — hits the buffering branch in makeRequest
+            yes "memtest-line-for-intg-2823" | head -c 524288000 > artifacts/big.log
+            # 300 MB application/json — hits the buffering + JSON.parse branch
+            python3 -c "import json,sys; \
+              sys.stdout.write(json.dumps([{'i':i,'pad':'x'*250} for i in range(1_000_000)]))" \
+              > artifacts/big.json
+            # Optional control: 200 MB binary — already streams pre-fix
+            head -c 209715200 /dev/urandom > artifacts/big.bin
+            ls -lh artifacts/
       - store_test_results:
           path: test-results
       - store_artifacts:
