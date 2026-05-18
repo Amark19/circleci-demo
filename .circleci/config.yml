@@ -36,17 +36,22 @@ jobs:
       - run:
           name: Run tests
           command: |
-            echo "Bs Tests: $BS_ENV_VARS"
             source venv/bin/activate
-            export PYTHONPATH=src
+            export PYTHONPATH=$PWD
+            mkdir -p test-results artifacts
+            pytest \
+              --junitxml=test-results/junit.xml \
+              --html=artifacts/report.html \
+              --self-contained-html
+      - store_test_results:
+          path: test-results
+      - store_artifacts:
+          path: artifacts
+          destination: test-artifacts
+      - store_artifacts:
+          path: test-results
+          destination: junit
 
-            if [[ -n "$BS_ENV_VARS" ]]; then
-              echo "Running only rerun tests: $BS_ENV_VARS"
-              pytest
-            else
-              echo "No rerun tests found, running full test suite."
-              pytest
-            fi
 
   deploy:
     executor: default
